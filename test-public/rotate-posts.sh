@@ -44,8 +44,9 @@ while true; do
     TIME="${POST%%|*}"
     CONTENT="${POST#*|}"
 
-    # Build the post HTML
-    read -r -d '' NEW_POST <<EOF
+    # Build the post HTML and write to temp file
+    POST_FILE="${HTML_FILE}.post"
+    cat > "$POST_FILE" <<EOF
             <div class="post">
                 <div class="post-header">
                     <img src="/derp.png" alt="Derpy" class="post-avatar">
@@ -63,12 +64,15 @@ EOF
     # Create temp file
     TMP_FILE="${HTML_FILE}.tmp"
 
-    # Use awk to replace between markers
-    awk -v slot="$SLOT" -v new_post="$NEW_POST" '
+    # Use awk to replace between markers, reading new post from file
+    awk -v slot="$SLOT" -v post_file="$POST_FILE" '
         /<!-- POST_START_[0-9] -->/ {
             if ($0 ~ "POST_START_" slot) {
                 print
-                print new_post
+                while ((getline line < post_file) > 0) {
+                    print line
+                }
+                close(post_file)
                 in_replace = 1
                 next
             }
@@ -81,8 +85,15 @@ EOF
         !in_replace { print }
     ' "$HTML_FILE" > "$TMP_FILE"
 
-    # Replace original file
-    mv "$TMP_FILE" "$HTML_FILE"
+    # Verify temp file is not empty before replacing
+    if [ -s "$TMP_FILE" ]; then
+        mv "$TMP_FILE" "$HTML_FILE"
+        rm -f "$POST_FILE"
+    else
+        echo "ERROR: Generated file is empty, aborting!"
+        rm -f "$TMP_FILE" "$POST_FILE"
+        exit 1
+    fi
 
     echo "$(date '+%H:%M:%S') - Updated slot $SLOT: ${TIME} - ${CONTENT:0:50}..."
 
