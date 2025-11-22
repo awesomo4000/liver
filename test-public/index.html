@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Meowbook - Derpy's Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f0f2f5;
+        }
+        #time-display {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            font-size: 1.2em;
+            color: white;
+            font-weight: bold;
+            z-index: 100;
+        }
+        #timezone {
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.8);
+            margin-left: 8px;
+        }
+        #hypercube {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            border: 2px solid #2563eb;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        .header {
+            background: #4267B2;
+            color: white;
+            padding: 12px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .profile-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #4267B2;
+        }
+        .profile-info h2 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+            color: #1c1e21;
+        }
+        .profile-info p {
+            color: #65676b;
+            font-size: 0.95em;
+        }
+        .timeline {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .timeline h3 {
+            margin-bottom: 15px;
+            color: #1c1e21;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e4e6eb;
+        }
+        .post {
+            padding: 15px 0;
+            border-bottom: 1px solid #e4e6eb;
+        }
+        .post:last-child {
+            border-bottom: none;
+        }
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        .post-meta {
+            flex: 1;
+        }
+        .post-author {
+            font-weight: bold;
+            color: #1c1e21;
+        }
+        .post-time {
+            font-size: 0.85em;
+            color: #65676b;
+        }
+        .post-content {
+            color: #1c1e21;
+            line-height: 1.5;
+            margin-left: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div id="time-display">
+        <span id="time"></span><span id="timezone"></span>
+    </div>
+
+    <div class="header">
+        <h1>🐱 Meowbook</h1>
+    </div>
+
+    <div class="container">
+        <div class="profile-card">
+            <img src="/derp.png" alt="Derpy" class="profile-pic">
+            <div class="profile-info">
+                <h2>Derpy</h2>
+                <p>Professional Napper • Treat Enthusiast • Part-time Hypercube Inspector</p>
+                <p>📍 Lives in a sunbeam near the couch</p>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <h3>Timeline</h3>
+
+            <!-- POST_START_0 -->
+            <div class="post">
+                <div class="post-header">
+                    <img src="/derp.png" alt="Derpy" class="post-avatar">
+                    <div class="post-meta">
+                        <div class="post-author">Derpy</div>
+                        <div class="post-time">2 hours ago</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    Just discovered that if you stare at the hypercube long enough, it stares back at you through the fourth dimension 👁️✨ #DeepThoughts #HypercubeLife
+                </div>
+            </div>
+            <!-- POST_END_0 -->
+
+            <!-- POST_START_1 -->
+            <div class="post">
+                <div class="post-header">
+                    <img src="/derp.png" alt="Derpy" class="post-avatar">
+                    <div class="post-meta">
+                        <div class="post-author">Derpy</div>
+                        <div class="post-time">5 hours ago</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    Demanded breakfast at 5am. Humans said no. Demanded again at 5:15am. Got breakfast. Persistence is key. 🍽️😼
+                </div>
+            </div>
+            <!-- POST_END_1 -->
+
+            <!-- POST_START_2 -->
+            <div class="post">
+                <div class="post-header">
+                    <img src="/derp.png" alt="Derpy" class="post-avatar">
+                    <div class="post-meta">
+                        <div class="post-author">Derpy</div>
+                        <div class="post-time">Yesterday</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    Caught a glimpse of the red dot today. It got away again. Tomorrow is a new day. The hunt continues. 🔴🐾
+                </div>
+            </div>
+            <!-- POST_END_2 -->
+
+            <!-- POST_START_3 -->
+            <div class="post">
+                <div class="post-header">
+                    <img src="/derp.png" alt="Derpy" class="post-avatar">
+                    <div class="post-meta">
+                        <div class="post-author">Derpy</div>
+                        <div class="post-time">2 days ago</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    Sat in a box for 4 hours. Best decision ever. 10/10 would recommend. 📦😸
+                </div>
+            </div>
+            <!-- POST_END_3 -->
+
+            <!-- POST_START_4 -->
+            <div class="post">
+                <div class="post-header">
+                    <img src="/derp.png" alt="Derpy" class="post-avatar">
+                    <div class="post-meta">
+                        <div class="post-author">Derpy</div>
+                        <div class="post-time">3 days ago</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    Inspected the new web server implementation. Only 141KB! Very efficient. More time for naps. Approved. ✅💤
+                </div>
+            </div>
+            <!-- POST_END_4 -->
+        </div>
+    </div>
+
+    <canvas id="hypercube" width="120" height="120"></canvas>
+
+    <script>
+        // Update time with timezone
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            const tzStr = now.toLocaleTimeString('en-US', { timeZoneName: 'short' }).split(' ').pop();
+            document.getElementById('time').textContent = timeStr;
+            document.getElementById('timezone').textContent = tzStr;
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+    <script src="/hypercube-v2.js"></script>
+</body>
+</html>

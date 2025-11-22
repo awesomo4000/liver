@@ -1,0 +1,75 @@
+.TH LIVER 1 "2025" "liver" "User Commands"
+.SH NAME
+liver \- simple development web server with automatic live reload
+.SH SYNOPSIS
+.B liver
+.RB \-d
+.I directory
+.RB [ \-p
+.IR port ]
+.RB [ \-w
+.IR watch-dir ]
+.RB [ \-n ]
+.SH DESCRIPTION
+.B liver
+is a minimal HTTP server that automatically reloads browsers when files change.
+It serves static files from a directory and watches for modifications, using
+polling to notify connected clients.
+.PP
+When files in the watched directory are modified, the server updates an atomic
+timestamp. Connected browsers poll /reload-time every 100ms and reload when the
+timestamp changes.
+.SH OPTIONS
+.TP
+.BR \-d ", " \-\-dir " " \fIpath\fR
+Directory to serve (required).
+.TP
+.BR \-p ", " \-\-port " " \fInumber\fR
+Port to listen on. Default is 0 (automatic/ephemeral port).
+.TP
+.BR \-w ", " \-\-watch " " \fIpath\fR
+Directory to watch for changes. Default is the same as
+.BR \-\-dir .
+.TP
+.BR \-n ", " \-\-no-browser
+Don't automatically open browser. Default behavior is to open the browser
+automatically.
+.TP
+.BR \-h ", " \-\-help
+Show help message and exit.
+.SH EXAMPLES
+Serve current directory on random port:
+.PP
+.RS
+.B liver \-d ./public
+.RE
+.PP
+Serve on specific port, watch different directory:
+.PP
+.RS
+.B liver \-d ./dist \-p 8080 \-w ./src
+.RE
+.PP
+Serve without opening browser:
+.PP
+.RS
+.B liver \-d ./public \-n
+.RE
+.SH IMPLEMENTATION
+The server uses platform-specific file watching:
+.IP \(bu 2
+FSEvents on macOS
+.IP \(bu 2
+inotify on Linux
+.IP \(bu 2
+ReadDirectoryChangesW on Windows
+.PP
+The reload mechanism injects a small JavaScript snippet into HTML files that
+polls the server for changes. No WebSocket connections are required.
+.SH FILES
+.TP
+.I /reload-time
+Internal endpoint that returns the current reload timestamp. Polled by browsers
+every 100ms.
+.SH ATTRIBUTION
+File watching implementations adapted from Zine by Loris Cro.

@@ -1,0 +1,12 @@
+.{
+    .name = .liver,
+    .version = "0.0.0",
+    .fingerprint = 0x2a334ec822ca8144,
+    .paths = .{
+        "src",
+        "build.zig",
+        "build.zig.zon",
+        "LICENSE",
+        "README.md",
+    },
+}
