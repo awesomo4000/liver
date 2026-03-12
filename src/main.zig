@@ -14,17 +14,18 @@ pub const Context = struct {
     gpa: Allocator,
     serve_dir: std.fs.Dir,
     serve_dir_path: []const u8,
+    index_file: []const u8,
     reload_timestamp: std.atomic.Value(i64),
 };
 
 fn usage() void {
     std.debug.print(
-        \\Usage: liver [options]
+        \\Usage: liver [options] [file]
         \\
         \\A simple development web server with live reload (the internal organ for dev!).
         \\
         \\Options:
-        \\  -d, --dir <path>       Directory to serve (required)
+        \\  -d, --dir <path>       Directory to serve (required unless file path provided)
         \\  -p, --port <number>    Port to listen on (default: 0 = auto)
         \\  -w, --watch <path>     Directory to watch for changes (default: same as --dir)
         \\  -n, --no-browser       Don't auto-open browser (default: auto-open)
@@ -34,6 +35,8 @@ fn usage() void {
         \\  liver -d ./public
         \\  liver -d ./dist -p 8080 -w ./src
         \\  liver -d ./public -n
+        \\  liver ./public/app.html
+        \\  liver -d ./dist -w ./src app.html
         \\
     , .{});
 }
@@ -51,6 +54,7 @@ pub fn main() !void {
     var watch_dir_path: ?[]const u8 = null;
     var port: u16 = 0; // 0 = ephemeral port
     var open_browser = true;
+    var index_file: []const u8 = "index.html";
 
     // Parse arguments
     while (args.next()) |arg| {
@@ -82,18 +86,31 @@ pub fn main() !void {
             };
         } else if (std.mem.eql(u8, arg, "-n") or std.mem.eql(u8, arg, "--no-browser")) {
             open_browser = false;
-        } else {
+        } else if (arg[0] == '-') {
             std.debug.print("Error: Unknown argument '{s}'\n\n", .{arg});
             usage();
             std.process.exit(1);
+        } else {
+            index_file = arg;
         }
     }
 
-    // Require serve directory
+    // Require serve directory (or infer from file path)
     if (serve_dir_path == null) {
-        std.debug.print("Error: --dir is required\n\n", .{});
-        usage();
-        std.process.exit(1);
+        if (std.mem.eql(u8, index_file, "index.html")) {
+            // No file arg either — still require --dir
+            std.debug.print("Error: --dir is required (or provide a file path)\n\n", .{});
+            usage();
+            std.process.exit(1);
+        }
+        // Infer serve dir from file's parent directory
+        if (std.fs.path.dirname(index_file)) |dir| {
+            serve_dir_path = dir;
+        } else {
+            serve_dir_path = ".";
+        }
+        // Strip directory prefix from index_file so it's relative to serve_dir
+        index_file = std.fs.path.basename(index_file);
     }
 
     // Default watch directory to serve directory
@@ -112,6 +129,7 @@ pub fn main() !void {
         .gpa = gpa,
         .serve_dir = serve_dir,
         .serve_dir_path = serve_dir_path.?,
+        .index_file = index_file,
         .reload_timestamp = std.atomic.Value(i64).init(std.time.timestamp()),
     };
 
@@ -128,12 +146,16 @@ pub fn main() !void {
     defer http_server.deinit();
 
     const actual_port = http_server.listen_address.in.getPort();
-    const url = try std.fmt.allocPrint(gpa, "http://127.0.0.1:{d}/", .{actual_port});
+    const url = if (std.mem.eql(u8, index_file, "index.html"))
+        try std.fmt.allocPrint(gpa, "http://127.0.0.1:{d}/", .{actual_port})
+    else
+        try std.fmt.allocPrint(gpa, "http://127.0.0.1:{d}/{s}", .{ actual_port, index_file });
     defer gpa.free(url);
 
     std.debug.print("\n", .{});
     std.debug.print("🚀 Live reload server running!\n", .{});
     std.debug.print("📂 Serving:  {s}\n", .{serve_dir_path.?});
+    std.debug.print("📄 File:     {s}\n", .{index_file});
     std.debug.print("👀 Watching: {s}\n", .{watch_dir_path.?});
     std.debug.print("🌐 URL:      {s}\n", .{url});
     std.debug.print("\n", .{});
@@ -249,14 +271,14 @@ fn serveFile(ctx: *Context, request: *std.http.Server.Request, target: []const u
         path = path[0..idx];
     }
 
-    // Default to index.html for root
+    // Default to index_file for root
     if (path.len == 0 or std.mem.eql(u8, path, "/")) {
-        path = "index.html";
+        path = ctx.index_file;
     }
 
-    // Append index.html if path ends with /
+    // Append index_file if path ends with /
     if (path.len > 0 and path[path.len - 1] == '/') {
-        path = try std.fmt.allocPrint(arena, "{s}index.html", .{path});
+        path = try std.fmt.allocPrint(arena, "{s}{s}", .{ path, ctx.index_file });
     }
 
     // Security: reject paths with ..
